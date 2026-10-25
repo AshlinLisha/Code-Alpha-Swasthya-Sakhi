@@ -2,13 +2,12 @@
 
 Your Health. Your Story. Your Next Step.
 
-A comprehensive, privacy-first digital healthcare companion empowering women across all life stages.
+A comprehensive, 100% offline, privacy-first digital healthcare companion empowering women across all life stages.
+With 100% client-side data persistence (localStorage), users maintain complete ownership of their intimate health data without privacy or security risks.
 
 📌 Project Overview
 
 Swasthya Sakhi is a holistic web platform built to address critical gaps in women's health tracking and diagnostic communication. While traditional period trackers only focus on dates, Swasthya Sakhi bridges reproductive health, chronic condition management (PCOS, Endometriosis, Thyroid disorders), mental wellness, and emergency safety into a unified, secure experience.
-
-With 100% client-side data persistence (localStorage), users maintain complete ownership of their intimate health data without privacy or security risks.
 
 ✨ Key Features & Live Architecture
 
@@ -34,9 +33,10 @@ Provides grounded self-care frameworks tailored to hormonal shifts.
 One-tap emergency connectivity (integrated 112 services).
 Quick access to safety protocols and local emergency guidance.
 
-6. 🔒 Privacy-First Engineering
-Zero cloud database reliance: all records are stored strictly inside the user's browser localStorage.
-Zero tracking scripts or third-party data selling.
+6. 🔒The Privacy-First & Offline Advantage
+Zero Backend & Serverless: Operating completely in the user's browser, no personal health metrics, dates, or notes ever touch a remote server.
+100% Offline Accessibility: Essential for users in low-connectivity or rural environments. Symptom logging, emergency tools, and wellness guides work seamlessly without an active internet connection.
+Client-Side Data Sovereignty: Data is persisted locally via localStorage. Zero third-party tracking scripts, zero cloud database reliance, and zero data selling.
 
 🚀 Future Roadmap & Expanded Vision
 
