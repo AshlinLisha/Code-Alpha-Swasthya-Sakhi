@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swasthya Sakhi - FINAL</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Kannada:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#e77a95;--teal:#4fb1b5;--bg:#fff7f9}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:Poppins,'Noto Sans Devanagari','Noto Sans Kannada',sans-serif}
+body.lang-hi{font-family:'Noto Sans Devanagari',Poppins,sans-serif}
+body.lang-kn{font-family:'Noto Sans Kannada',Poppins,sans-serif}
+header{background:linear-gradient(135deg,var(--teal),var(--pink));color:#fff;padding:14px 18px;position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center}
+.container{max-width:1100px;margin:auto;padding:18px}
+nav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+nav button{background:#fff;border:1px solid #ffd3de;color:#5a2230;padding:9px 16px;border-radius:22px;cursor:pointer;font-size:13px}
+nav button.active{background:linear-gradient(135deg,#e77a95,#4fb1b5);color:#fff;border:none}
+.card{background:#fff;border-radius:18px;padding:18px;margin-bottom:18px;box-shadow:0 6px 18px rgba(231,122,149,.12);border:1px solid #ffe1e8}
+.btn{background:linear-gradient(135deg,#e77a95,#4fb1b5);color:#fff;border:none;padding:10px 18px;border-radius:25px;cursor:pointer;font-weight:600}
+.btn-small{padding:7px 14px;font-size:12px}
+input,select,textarea{width:100%;padding:11px 12px;border-radius:12px;border:1px solid #ffd3de;margin:7px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
+.hidden{display:none!important}
+#loginScreen{height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#8cd1d3,#f8b5c5);padding:20px}
+.loginBox{background:#fff;padding:28px;border-radius:22px;max-width:420px;width:100%;text-align:center}
+.tab{display:none}.tab.active{display:block}
+.feature-box{width:100%;height:110px;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,#fff0f3,#e0f7f7)}
+.sos-card{background:linear-gradient(135deg,#ff5a5a,#ff8a8a);color:#fff;border-radius:14px;padding:14px;margin:10px 0;display:flex;justify-content:space-between;align-items:center}
+.sos-card.teal{background:linear-gradient(135deg,#4fb1b5,#2a9a9e)}
+#langBar{position:fixed;bottom:12px;right:12px;z-index:200;background:#fff;padding:6px 10px;border-radius:20px;box-shadow:0 4px 12px rgba(0,0,0,.2);display:flex;gap:6px}
+#langBar button{border:none;padding:6px 14px;border-radius:15px;cursor:pointer;font-size:12px;background:#eee}
+#langBar button.activeLang{background:linear-gradient(135deg,#e77a95,#4fb1b5);color:#fff}
+</style>
+</head>
+<body>
+<div id="loginScreen"><div class="loginBox"><div style="width:75px;height:75px;margin:auto;background:linear-gradient(135deg,#4fb1b5,#e77a95);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:36px">🌸</div><h2 id="t-appName">Swasthya Sakhi</h2><p style="font-size:11px;color:#888" id="t-sub">Your Private Health Friend</p><br>
+<div id="loginStep1"><input id="loginCode" type="password" placeholder="Enter 4-6 Digit Code" maxlength="6" style="font-size:20px;letter-spacing:6px;text-align:center"><button class="btn" onclick="checkCode()" id="t-continue">Continue</button><p id="debugMsg" style="color:red;font-size:12px;margin-top:6px"></p><p style="font-size:11px;margin-top:8px;color:#666" id="t-codeHint">First time? Code creates account. Next time only code.</p></div>
+<div id="loginStep2" class="hidden"><input id="loginName" placeholder="Your Name"><p style="font-size:12px;color:#e77a95;margin-top:6px">Code <b id="showCode"></b> <span id="t-new">is new</span></p><button class="btn" onclick="registerNew()" id="t-register">Register</button><button style="background:none;border:none;color:#888;font-size:12px;margin-top:8px;cursor:pointer" onclick="backToCode()" id="t-back">Back</button></div>
+<div id="loginStepExists" class="hidden"><p style="font-size:14px"><span id="t-wb">Welcome back</span> <b id="existName"></b>!</p><button class="btn" onclick="loginExisting()" id="t-login">Login Now</button><button style="background:none;border:none;color:#888;font-size:12px;margin-top:8px;cursor:pointer" onclick="backToCode()" id="t-diff">Use different code</button></div>
+</div></div>
+
+<div id="app" class="hidden"><header><span id="t-header" style="font-weight:700">Swasthya Sakhi</span><button onclick="logout()" style="background:rgba(0,0,0,.2);color:#fff;border:none;padding:6px 12px;border-radius:20px;font-size:11px" id="t-logout">Logout</button></header>
+<div class="container">
+<nav id="mainNav"><button class="active" onclick="showTab('home')" id="nav-home">Home</button><button onclick="showTab('track')" id="nav-cycle">Cycle</button><button onclick="showTab('journal')" id="nav-journal">Journal</button><button onclick="showTab('health')" id="nav-learn">Learn</button><button onclick="showTab('mind')" id="nav-mind">Mind</button><button onclick="showTab('medicine')" id="nav-medicine">Medicine</button><button onclick="showTab('sos')" id="nav-sos">SOS</button></nav>
+
+<div id="home" class="tab active"><div class="card"><h3 id="t-welcome">Welcome <span id="userName"></span> 🌸</h3><p style="font-size:13px" id="t-welcomeSub">Data saved offline for tomorrow!</p><div class="grid" style="margin-top:12px"><div><strong id="cycleCount">0</strong><br><small id="t-entries">Entries</small></div><div><strong id="waterCount">0</strong> L<br><small id="t-waterL">Water</small></div><div><strong id="medCount">0</strong><br><small id="t-rem">Reminders</small></div></div></div>
+<div class="grid"><div class="card"><div class="feature-box">💧</div><h4 id="t-water">Water & Diet</h4><input type="number" id="waterInput" placeholder="Water Litres e.g., 2"><input id="dietInput" placeholder="Iron food e.g., Spinach"><button class="btn btn-small" onclick="addWater()" id="t-add">Add</button><div id="waterList" style="font-size:12px;margin-top:8px"></div></div>
+<div class="card"><div class="feature-box">🔍</div><h4 id="t-symptom">Symptom Hint</h4><input id="symptomInput" placeholder="fatigue, lump, discharge"><button class="btn btn-small" onclick="checkSymptom()" id="t-check">Check</button><div id="symptomResult" style="font-size:13px;margin-top:8px;background:#f7ffff;padding:8px;border-radius:10px"></div></div></div></div>
+
+<div id="track" class="tab"><div class="card"><h3 id="t-cycleTitle">Cycle Tracking</h3><input type="date" id="cycleDate"><select id="cycleFlow"><option id="t-light">Light</option><option id="t-medium">Medium</option><option id="t-heavy">Heavy</option><option id="t-noPeriod">No period - Mood only</option></select><input id="cycleMood" placeholder="Mood Happy/Sad"><input id="cycleSymptom" placeholder="Symptom"><button class="btn" onclick="addCycle()" id="t-save">Save</button></div><div class="card"><h4 id="t-yourEntries">Your Entries - With Delete</h4><div id="cycleList"></div></div></div>
+
+<div id="journal" class="tab"><div class="card"><div class="feature-box">📔</div><h3 id="t-journalTitle">Daily Private Journal</h3><p style="font-size:12px" id="t-journalSub">Write feelings - private, stays in this phone only.</p><textarea id="journalText" rows="4" placeholder="Today I feel..."></textarea><select id="journalMood"><option>😊 Happy</option><option>😔 Sad</option><option>😰 Anxious</option><option>😡 Angry</option><option>😴 Tired</option></select><button class="btn" onclick="addJournal()" id="t-saveJournal">Save Journal</button></div><div class="card"><h4 id="t-journalEntries">Your Journal Entries</h4><div id="journalList"></div></div></div>
+<div id="health" class="tab">
+<style>
+.learn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.learn-card{cursor:pointer;transition:transform .2s}
+.learn-card:hover{transform:scale(1.03)}
+.learn-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:300;align-items:center;justify-content:center;padding:20px}
+.learn-modal.show{display:flex}
+.learn-modal-content{background:#fff;border-radius:20px;padding:22px;max-width:550px;width:100%;max-height:85vh;overflow:auto;position:relative}
+.learn-modal-content h2{color:#e77a95;margin-bottom:8px}
+.learn-modal-content h4{color:#4fb1b5;margin:12px 0 4px}
+.closeModal{position:absolute;top:10px;right:14px;background:#ff5a5a;color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer}
+.learn-tag{display:inline-block;background:#fff0f3;color:#e77a95;padding:3px 10px;border-radius:12px;font-size:11px;margin:3px}
+</style>
+
+<div class="card" style="background:linear-gradient(135deg,#fff7f9,#e0f7f7)"><h3 id="t-learnMainTitle">📚 Women's Health Learn Hub - Tap any card to read more</h3><p style="font-size:12px" id="t-learnSub">10 topics - government info, prevention, when to see doctor</p></div>
+
+<div class="learn-grid">
+<div class="card learn-card" onclick="openLearn('breast')"><div class="feature-box">🎗️</div><h4>Breast Cancer</h4><p style="font-size:12px">Self-exam, symptoms, mammogram</p><span class="learn-tag">Monthly check</span></div>
+<div class="card learn-card" onclick="openLearn('cervical')"><div class="feature-box">💉</div><h4>Cervical Cancer & HPV Vaccine</h4><p style="font-size:12px">Vaccine age, Pap smear, prevention</p><span class="learn-tag">Vaccine 9-26 yr</span></div>
+<div class="card learn-card" onclick="openLearn('anemia')"><div class="feature-box">🩸</div><h4>Anemia & Nutrition</h4><p style="font-size:12px">Iron foods, symptoms, Hb test</p><span class="learn-tag">Spinach, jaggery</span></div>
+<div class="card learn-card" onclick="openLearn('pregnancy')"><div class="feature-box">🤰</div><h4>Pregnancy Care</h4><p style="font-size:12px">ANC, danger signs, 102 ambulance</p><span class="learn-tag">ANC <12 weeks</span></div>
+<div class="card learn-card" onclick="openLearn('periods')"><div class="feature-box">🩸</div><h4>Periods & Menstrual Hygiene</h4><p style="font-size:12px">Normal cycle, heavy bleeding, pads</p><span class="learn-tag">21-35 days normal</span></div>
+<div class="card learn-card" onclick="openLearn('pcos')"><div class="feature-box">⚖️</div><h4>PCOS / PCOD</h4><p style="font-size:12px">Irregular periods, weight, treatment</p><span class="learn-tag">1 in 5 women</span></div>
+<div class="card learn-card" onclick="openLearn('hygiene')"><div class="feature-box">🚿</div><h4>Intimate Hygiene & Infection</h4><p style="font-size:12px">UTI, white discharge, when to test</p><span class="learn-tag">Prevent UTI</span></div>
+<div class="card learn-card" onclick="openLearn('contraception')"><div class="feature-box">💊</div><h4>Contraception & Family Planning</h4><p style="font-size:12px">Methods, condoms, pills, Copper-T</p><span class="learn-tag">Safe choices</span></div>
+<div class="card learn-card" onclick="openLearn('nutrition')"><div class="feature-box">🥗</div><h4>Nutrition for Women</h4><p style="font-size:12px">Calcium, iron, vitamin D, diet chart</p><span class="learn-tag">Daily needs</span></div>
+<div class="card learn-card" onclick="openLearn('mental')"><div class="feature-box">🧠</div><h4>Mental Health</h4><p style="font-size:12px">Depression, anxiety, postpartum, Kiran</p><span class="learn-tag">You are not alone</span></div>
+</div>
+
+<div id="learnModal" class="learn-modal" onclick="closeLearn(event)"><div class="learn-modal-content"><button class="closeModal" onclick="document.getElementById('learnModal').classList.remove('show')">X</button><div id="learnContent"></div></div></div>
+</div>
+
+<script>
+// Learn Data
+const learnData={
+breast:`<h2>🎗️ Breast Cancer - Full Guide</h2>
+<h4>What is it?</h4><p>Most common cancer in women. Early detection = 90% curable.</p>
+<h4>Self-Exam - How to do monthly after period:</h4><p>1. Stand before mirror, check size/shape change, skin dimpling<br>2. Raise arms, look for same<br>3. Lie down, use 3 fingers, circular motion whole breast + armpit<br>4. Press nipple - check discharge</p>
+<h4>Warning Signs - See doctor if:</h4><p>- Lump >2 weeks, hard, not moving<br>- Nipple discharge blood<br>- Skin like orange peel<br>- Nipple pulled inside</p>
+<h4>When test?</h4><p>- Self-exam monthly from 20 yr<br>- Doctor exam yearly after 30<br>- Mammogram after 40 every 2 years (free at govt hospital)</p>
+<h4>Government Help:</h4><p>108 ambulance, District Hospital screening, Ayushman Bharat covers treatment.</p>`,
+cervical:`<h2>💉 Cervical Cancer & HPV</h2>
+<h4>Cause:</h4><p>HPV virus (sexually transmitted). 99% cervical cancers due to HPV.</p>
+<h4>HPV Vaccine - Most Important:</h4><p>- Age 9-26 years best, 2 doses (0, 6 months)<br>- After 26-45 also useful but 3 doses<br>- Govt free at PHC, schools under RBSK<br>- Prevents 90% cervical cancer + also vaginal, throat cancer</p>
+<h4>Pap Smear Test:</h4><p>- After 21 yr OR after 3 years of sexual activity<br>- Every 3 years, free at govt hospital<br>- Detects early before cancer</p>
+<h4>Symptoms:</h4><p>Bleeding after sex, bad smell discharge, pelvic pain -> test immediately</p>
+<h4>Prevention:</h4><p>Vaccine + safe sex (condom) + no smoking + Pap test</p>`,
+anemia:`<h2>🩸 Anemia - Low Blood</h2>
+<h4>India's biggest women's problem - 50% women anemic</h4>
+<h4>Symptoms:</h4><p>Fatigue, dizziness, pale eyes/nails, breathlessness, hair fall, crave mud/chalk</p>
+<h4>Test:</h4><p>Hb test at PHC/ASHA - Normal 12-15 g/dL. <12 = anemic</p>
+<h4>Iron Rich Foods:</h4><p>- Green: Spinach, drumstick leaves, curry leaves<br>- Jaggery + groundnut<br>- Beetroot, pomegranate, apple<br>- Ragi, bajra<br>- Sprouts, dates<br>- Non-veg: liver, egg<br>- Eat with Vitamin C (lemon, orange) for better absorption</p>
+<h4>Tablets:</h4><p>IFA red tablet weekly free at PHC/Anganwadi. Take after food with lemon water, not milk/tea.</p>
+<h4>When urgent:</h4><p>Hb <7, chest pain, fainting -> 108 call</p>`,
+pregnancy:`<h2>🤰 Pregnancy Care - 9 Months</h2>
+<h4>First ANC:</h4><p>Within 12 weeks at PHC. Get MCP card, blood tests, TT injection</p>
+<h4>4 ANC Must:</h4><p>1st <12 weeks, 2nd 14-26 weeks, 3rd 28-34 weeks, 4th 36 weeks</p>
+<h4>Daily Care:</h4><p>- Folic acid first 3 months<br>- Iron + Calcium from 4th month (not together, calcium morning, iron night)<br>- Eat extra 1 meal + 2L water<br>- Sleep left side<br>- Walk 30 min</p>
+<h4>Danger Signs - Call 102 immediately:</h4><p>- Heavy bleeding<br>- Severe headache + blurry vision (BP high)<br>- Less baby movement after 7 months<br>- Water break before 9 months<br>- Fever >100F</p>
+<h4>Govt Schemes:</h4><p>Janani Suraksha, 102 free ambulance, free delivery at govt hospital + Rs 1400 cash</p>`,
+periods:`<h2>🩸 Periods - What's Normal?</h2>
+<h4>Normal:</h4><p>- Cycle 21-35 days (from 1st day of one period to next)<br>- Bleeding 2-7 days<br>- Blood 30-80ml (3-6 pads/day)</p>
+<h4>Abnormal - See Doctor:</h4><p>- Gap <21 days or >35 days regularly<br>- Bleeding >7 days<br>- Heavy: pad soak <2 hr<br>- No period 3 months (not pregnant)<br>- Severe cramps not relieved by medicine<br>- Bleeding between periods</p>
+<h4>Hygiene:</h4><p>- Change pad every 4-6 hr<br>- Wash with plain water only (no soap inside)<br>- Cotton underwear, change daily<br>- Dispose pad in paper, not flush</p>
+<h4>For Pain:</h4><p>Hot water bag, light exercise, iron foods. If severe, check for PCOS, thyroid.</p>`,
+pcos:`<h2>⚖️ PCOS/PCOD - Common 1 in 5 women</h2>
+<h4>What?</h4><p>Hormone imbalance, ovaries make many small cysts.</p>
+<h4>Symptoms:</h4><p>- Irregular/no periods<br>- Weight gain especially belly<br>- Hair on face, acne<br>- Hair fall on head<br>- Difficulty getting pregnant<br>- Dark skin on neck/armpit</p>
+<h4>Test:</h4><p>USG scan + thyroid + prolactin + testosterone at govt hospital</p>
+<h4>Management - No permanent cure but control:</h4><p>- Lose 5-10% weight = periods regular in 50%<br>- Exercise 45 min daily<br>- Low sugar, no junk, millets, veggies<br>- Doctor may give: Meformin, hormone pills for 3-6 months<br>- Myo-inositol supplement</p>
+<h4>Long risk if ignored:</h4><p>Diabetes, infertility, uterus cancer. So early treatment important.</p>`,
+hygiene:`<h2>🚿 Hygiene & Infection</h2>
+<h4>UTI - Burning urine:</h4><p>- Drink 2-3L water, don't hold urine<br>- Urinate after sex<br>- Wipe front to back<br>- Cotton underwear</p>
+<h4>White Discharge:</h4><p>- Normal: small, white, no smell, no itch = just ovulation<br>- Abnormal: yellow/green, bad smell, itching, burning, curd-like -> infection -> see doctor</p>
+<h4>Prevent:</h4><p>- Wash only outside with water, no inside wash, no scented soap<br>- Change underwear daily<br>- During periods change pad 4 hrly<br>- Safe sex - condom prevents STD</p>
+<h4>STD Signs:</h4><p>Sores, blisters, bad smell discharge, pain after sex -> test free at govt ICTC center</p>`,
+contraception:`<h2>💊 Contraception - Family Planning</h2>
+<h4>Methods:</h4>
+<p><b>1. Condom (Male/Female):</b> Prevents pregnancy + STD/HIV, free at PHC</p>
+<p><b>2. Copper-T:</b> Insert in uterus, works 5-10 years, free at govt, no hormones</p>
+<p><b>3. Pills:</b> Mala-N daily, or emergency pill within 72 hr (not regular method)</p>
+<p><b>4. Injection Antara:</b> Every 3 months, free at govt</p>
+<p><b>5. Permanent:</b> Tubectomy after family complete</p>
+<h4>Choose:</h4><p>Discuss with doctor/ASHA which suits you. No method 100%, condom + other = best.</p>
+<h4>Myths:</h4><p>Copper-T does NOT go to heart, pills does NOT cause lifelong infertility, emergency pill not abortion pill.</p>`,
+nutrition:`<h2>🥗 Nutrition for Every Woman</h2>
+<h4>Daily Needs:</h4><p>- Iron 18mg (21mg pregnant): spinach, jaggery, ragi<br>- Calcium 1000mg: milk, curd, ragi, sesame<br>- Protein 46g: dal, egg, sprouts, soy<br>- Vitamin D: sunlight 20 min morning<br>- Folic acid: green leaves</p>
+<h4>Diet Chart Simple:</h4><p>Morning: Ragi porridge + groundnut<br>Lunch: Rice/roti + dal + green leaves + curd<br>Evening: Fruit + sprouts<br>Dinner: Roti + veg + milk</p>
+<h4>Avoid:</h4><p>Too much tea/coffee with food (blocks iron), junk, alcohol, smoking</p>
+<h4>Water:</h4><p>2-3L daily, more in summer, if urine yellow = drink more</p>`,
+mental:`<h2>🧠 Mental Health - You Are Not Alone</h2>
+<h4>Common in women:</h4><p>- Mood swings before periods (PMS) - normal<br>- Anxiety, sadness, sleep problem<br>- Postpartum depression after delivery: crying, not bonding with baby, guilt >2 weeks -> needs help, not your fault</p>
+<h4>Self-Care:</h4><p>- Talk to trusted person<br>- Walk, breathing, music, journal<br>- Sleep 7-8 hr, less phone at night<br>- No alcohol to cope</p>
+<h4>When to get help:</h4><p>- Sad >2 weeks, can't work<br>- Thoughts of harming self/baby<br>- Panic, fast heartbeat often</p>
+<h4>Free Help India:</h4><p>- Kiran 1800-599-0019 24/7<br>- iCall 9152987821<br>- Govt hospital psychiatrist free<br>- ASHA worker can guide</p>
+<p>Seeking help = strong, not weak.</p>`
+};
+function openLearn(key){
+document.getElementById('learnContent').innerHTML=learnData[key]||'Info coming';
+document.getElementById('learnModal').classList.add('show');
+}
+function closeLearn(e){
+if(e.target.id==='learnModal') document.getElementById('learnModal').classList.remove('show');
+}
+</script>
+<div id="mind" class="tab"><div class="grid"><div class="card"><h3 id="t-breath">Breathing Exercise</h3><div id="breathCircle" style="width:100px;height:100px;margin:20px auto;background:#8cd1d3;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">Breathe</div><button class="btn btn-small" onclick="startBreath()" id="t-startBreath">Start 1 min</button></div><div class="card"><h3 id="t-sounds">Relaxation Sounds - Offline Works</h3><button onclick="playSound('rain')" class="btn btn-small" id="t-rain">🌧️ Rain</button><button onclick="playSound('ocean')" class="btn btn-small" id="t-ocean">🌊 Ocean</button><button onclick="playSound('white')" class="btn btn-small" id="t-white">🎵 White Noise</button><br><br><button onclick="stopSounds()" class="btn btn-small" style="background:#ff5a5a" id="t-stop">⏹️ Stop</button><p id="soundStatus" style="font-size:11px;color:green;margin-top:6px"></p></div></div><div class="card"><h3 id="t-game">Bubble Pop Game</h3><div id="gameArea" style="position:relative;height:220px;background:#f0ffff;border-radius:12px;overflow:hidden;border:1px solid #c2e9fb"><div style="padding:8px;display:flex;gap:8px"><button class="btn btn-small" onclick="startGame()" id="t-startGame">Start</button><button class="btn btn-small" style="background:#ff5a5a" onclick="stopGame()" id="t-stopGame">Stop</button><span id="score">Score:0</span></div></div></div></div>
+
+<div id="medicine" class="tab"><div class="card"><h3 id="t-medTitle">Medicine Reminder - Simple</h3><p style="font-size:11px;color:#888" id="t-medSub">Just reminder, not connected to clock. Write and save.</p><input id="medName" placeholder="Tablet Name e.g., Iron"><input id="medDose" placeholder="Dose e.g., 1 daily after food"><input id="medFor" placeholder="For disease e.g., Anemia"><input type="time" id="medTime"><button class="btn" onclick="addMed()" id="t-set">Save Reminder</button></div><div class="card"><h4 id="t-yourRem">Your Reminders</h4><div id="medList"></div></div></div>
+
+<div id="sos" class="tab"><div class="card" style="background:#fff0f0"><h3 id="t-sosTitle">Emergency SOS - Govt Numbers</h3><div class="sos-card"><div><b>Ambulance 108</b></div><a href="tel:108" class="btn btn-small" style="background:#fff;color:#ff5a5a">CALL</a></div><div class="sos-card"><div><b>Pregnancy Ambulance 102</b></div><a href="tel:102" class="btn btn-small" style="background:#fff;color:#ff5a5a">CALL</a></div><div class="sos-card teal"><div><b>Women Helpline 181</b></div><a href="tel:181" class="btn btn-small" style="background:#fff;color:#4fb1b5">CALL</a></div><div class="sos-card"><div><b>Emergency 112</b></div><a href="tel:112" class="btn btn-small" style="background:#fff;color:#ff5a5a">CALL</a></div><div class="sos-card teal"><div><b>Health 104</b></div><a href="tel:104" class="btn btn-small" style="background:#fff;color:#4fb1b5">CALL</a></div><div class="sos-card" style="background:linear-gradient(135deg,#7a3fe0,#a07ae0)"><div><b id="t-kiran">🧠 Mental SOS Kiran 1800-599-0019</b></div><a href="tel:18005990019" class="btn btn-small" style="background:#fff;color:#7a3fe0">CALL</a></div></div></div>
+
+</div></div>
+<div id="langBar"><button onclick="setLang('en')" id="btn-en" class="activeLang">EN</button><button onclick="setLang('hi')" id="btn-hi">हिंदी</button><button onclick="setLang('kn')" id="btn-kn">ಕನ್ನಡ</button></div>
+
+<script>
+const T={
+en:{appName:"Swasthya Sakhi",sub:"Your Private Health Friend",continue:"Continue",codeHint:"First time? Code creates account. Next time only code.",new:"is new",register:"Register",back:"Back",wb:"Welcome back",login:"Login Now",diff:"Use different code",header:"Swasthya Sakhi",logout:"Logout",home:"Home",cycle:"Cycle",journal:"Journal",learn:"Learn",mind:"Mind",medicine:"Medicine",sos:"SOS",welcome:"Welcome",welcomeSub:"Data saved offline for tomorrow!",entries:"Entries",waterL:"Water",rem:"Reminders",water:"Water & Diet",symptom:"Symptom Hint",check:"Check",cycleTitle:"Cycle Tracking",yourEntries:"Your Entries - With Delete",light:"Light",medium:"Medium",heavy:"Heavy",noPeriod:"No period - Mood only",save:"Save",journalTitle:"Daily Private Journal",journalSub:"Write feelings - private, stays in this phone only.",saveJournal:"Save Journal",journalEntries:"Your Journal Entries",breast:"Breast Cancer",breastDesc:"Monthly self-exam after period. Early detection saves life.",cervical:"Cervical Cancer & HPV",cervicalDesc:"HPV vaccine 9-26 years prevents cancer. Free at govt hospital.",anemia:"Anemia",anemiaDesc:"Spinach, jaggery, beetroot, ragi, iron tablet.",preg:"Pregnancy Care",pregDesc:"ANC within 12 weeks, folic acid, iron, call 102.",breath:"Breathing Exercise",startBreath:"Start 1 min",sounds:"Relaxation Sounds - Offline Works",rain:"🌧️ Rain",ocean:"🌊 Ocean",white:"🎵 White Noise",stop:"⏹️ Stop",game:"Bubble Pop Game",startGame:"Start",stopGame:"Stop",medTitle:"Medicine Reminder - Simple",medSub:"Just reminder, not connected to clock. Write and save.",set:"Save Reminder",yourRem:"Your Reminders",sosTitle:"Emergency SOS - Govt Numbers",kiran:"🧠 Mental SOS Kiran 1800-599-0019",add:"Add"},
+hi:{appName:"स्वास्थ्य सखी",sub:"आपकी निजी स्वास्थ्य सखी",continue:"जारी रखें",codeHint:"पहली बार? कोड नया अकाउंट बनाएगा। अगली बार सिर्फ कोड।",new:"नया है",register:"रजिस्टर करें",back:"पीछे",wb:"वापसी पर स्वागत",login:"लॉगिन करें",diff:"दूसरा कोड",header:"स्वास्थ्य सखी",logout:"लॉगआउट",home:"होम",cycle:"मासिक धर्म",journal:"डायरी",learn:"जानकारी",mind:"मन",medicine:"दवा",sos:"आपातकाल",welcome:"स्वागत है",welcomeSub:"आपका डेटा कल भी सुरक्षित रहेगा!",entries:"एंट्री",waterL:"पानी",rem:"रिमाइंडर",water:"पानी और आहार",symptom:"लक्षण संकेत",check:"जांचें",cycleTitle:"मासिक धर्म ट्रैकिंग",yourEntries:"आपकी एंट्री - हटाने का विकल्प",light:"हल्का",medium:"मध्यम",heavy:"भारी",noPeriod:"पीरियड नहीं - सिर्फ मूड",save:"सेव करें",journalTitle:"रोज़ की निजी डायरी",journalSub:"अपनी भावनाएं लिखें - निजी, इसी फोन में।",saveJournal:"डायरी सेव करें",journalEntries:"आपकी डायरी एंट्री",breast:"स्तन कैंसर",breastDesc:"महीने में एक बार जांच। जल्दी पता चलने से जान बचती है।",cervical:"सरवाइकल कैंसर और HPV",cervicalDesc:"9-26 साल में टीका। सरकारी अस्पताल में मुफ्त।",anemia:"एनीमिया",anemiaDesc:"पालक, गुड़, चुकंदर, रागी, आयरन गोली।",preg:"गर्भावस्था देखभाल",pregDesc:"12 हफ्ते में ANC जांच, फोलिक एसिड, आयरन, 102 पर कॉल।",breath:"सांस व्यायाम",startBreath:"1 मिनट शुरू करें",sounds:"आरामदायक ध्वनियाँ - ऑफलाइन चलती हैं",rain:"🌧️ बारिश",ocean:"🌊 समुद्र",white:"🎵 श्वेत शोर",stop:"⏹️ रोकें",game:"बबल पॉप खेल",startGame:"शुरू करें",stopGame:"रोकें",medTitle:"दवा रिमाइंडर - सरल",medSub:"सिर्फ रिमाइंडर, घड़ी से नहीं जुड़ा। लिखें और सेव करें।",set:"रिमाइंडर सेव करें",yourRem:"आपके रिमाइंडर",sosTitle:"आपातकालीन SOS - सरकारी नंबर",kiran:"🧠 मानसिक SOS किरण 1800-599-0019",add:"जोड़ें"},
+kn:{appName:"ಸ್ವಾಸ್ಥ್ಯ ಸಖಿ",sub:"ನಿಮ್ಮ ಖಾಸಗಿ ಆರೋಗ್ಯ ಸಖಿ",continue:"ಮುಂದುವರಿಸಿ",codeHint:"ಮೊದಲ ಬಾರಿ? ಕೋಡ್ ಹೊಸ ಖಾತೆ ಮಾಡುತ್ತದೆ। ಮುಂದೆ ಕೋಡ್ ಮಾತ್ರ।",new:"ಹೊಸದು",register:"ನೋಂದಾಯಿಸಿ",back:"ಹಿಂದೆ",wb:"ಮರಳಿ ಸ್ವಾಗತ",login:"ಲಾಗಿನ್",diff:"ಬೇರೆ ಕೋಡ್",header:"ಸ್ವಾಸ್ಥ್ಯ ಸಖಿ",logout:"ಲಾಗ್‌ಔಟ್",home:"ಹೋಮ್",cycle:"ಋತುಚಕ್ರ",journal:"ದಿನಚರಿ",learn:"ಮಾಹಿತಿ",mind:"ಮನಸ್ಸು",medicine:"ಔಷಧಿ",sos:"ತುರ್ತು",welcome:"ಸ್ವಾಗತ",welcomeSub:"ನಿಮ್ಮ ಡೇಟಾ ನಾಳೆಯೂ ಸುರಕ್ಷಿತವಾಗಿರುತ್ತದೆ!",entries:"ನಮೂದುಗಳು",waterL:"ನೀರು",rem:"ಜ್ಞಾಪನೆಗಳು",water:"ನೀರು ಮತ್ತು ಆಹಾರ",symptom:"ಲಕ್ಷಣ ಸುಳಿವು",check:"ಪರಿಶೀಲಿಸಿ",cycleTitle:"ಋತುಚಕ್ರ ಟ್ರ್ಯಾಕಿಂಗ್",yourEntries:"ನಿಮ್ಮ ನಮೂದುಗಳು - ಅಳಿಸುವ ಆಯ್ಕೆ",light:"ಹಗುರ",medium:"ಮಧ್ಯಮ",heavy:"ಭಾರಿ",noPeriod:"ಋತು ಇಲ್ಲ - ಮೂಡ್ ಮಾತ್ರ",save:"ಉಳಿಸಿ",journalTitle:"ದೈನಂದಿನ ಖಾಸಗಿ ದಿನಚರಿ",journalSub:"ನಿಮ್ಮ ಭಾವನೆಗಳನ್ನು ಬರೆಯಿರಿ - ಖಾಸಗಿ, ಇದೇ ಫೋನ್‌ನಲ್ಲಿ।",saveJournal:"ದಿನಚರಿ ಉಳಿಸಿ",journalEntries:"ನಿಮ್ಮ ದಿನಚರಿ ನಮೂದುಗಳು",breast:"ಸ್ತನ ಕ್ಯಾನ್ಸರ್",breastDesc:"ತಿಂಗಳಿಗೆ ಒಮ್ಮೆ ಪರೀಕ್ಷೆ। ಬೇಗ ಪತ್ತೆ ಜೀವ ಉಳಿಸುತ್ತದೆ।",cervical:"ಗರ್ಭಕಂಠದ ಕ್ಯಾನ್ಸರ್ ಮತ್ತು HPV",cervicalDesc:"9-26 ವಯಸ್ಸಿನಲ್ಲಿ ಲಸಿಕೆ। ಸರ್ಕಾರಿ ಆಸ್ಪತ್ರೆಯಲ್ಲಿ ಉಚಿತ।",anemia:"ರಕ್ತಹೀನತೆ",anemiaDesc:"ಸೊಪ್ಪು, ಬೆಲ್ಲ, ಬೀಟ್ರೂಟ್, ರಾಗಿ, ಕಬ್ಬಿಣದ ಮಾತ್ರೆ।",preg:"ಗರ್ಭಧಾರಣೆ ಆರೈಕೆ",pregDesc:"12 ವಾರಗಳಲ್ಲಿ ANC ತಪಾಸಣೆ, ಫೋಲಿಕ್ ಆಮ್ಲ, ಕಬ್ಬಿಣ, 102 ಗೆ ಕರೆ।",breath:"ಉಸಿರಾಟದ ವ್ಯಾಯಾಮ",startBreath:"1 ನಿಮಿಷ ಪ್ರಾರಂಭಿಸಿ",sounds:"ಶಾಂತ ಧ್ವನಿಗಳು - ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಕೆಲಸ",rain:"🌧️ ಮಳೆ",ocean:"🌊 ಸಮುದ್ರ",white:"🎵 ಬಿಳಿ ಶಬ್ದ",stop:"⏹️ ನಿಲ್ಲಿಸಿ",game:"ಬಬಲ್ ಪಾಪ್ ಆಟ",startGame:"ಪ್ರಾರಂಭಿಸಿ",stopGame:"ನಿಲ್ಲಿಸಿ",medTitle:"ಔಷಧಿ ಜ್ಞಾಪನೆ - ಸರಳ",medSub:"ಕೇವಲ ಜ್ಞಾಪನೆ, ಗಡಿಯಾರಕ್ಕೆ ಸಂಪರ್ಕವಿಲ್ಲ। ಬರೆದು ಉಳಿಸಿ।",set:"ಜ್ಞಾಪನೆ ಉಳಿಸಿ",yourRem:"ನಿಮ್ಮ ಜ್ಞಾಪನೆಗಳು",sosTitle:"ತುರ್ತು SOS - ಸರ್ಕಾರಿ ಸಂಖ್ಯೆಗಳು",kiran:"🧠 ಮಾನಸಿಕ SOS ಕಿರಣ್ 1800-599-0019",add:"ಸೇರಿಸಿ"}
+};
+let currentUser=null,tempCode='',storage;
+try{localStorage.setItem('__t','1');localStorage.removeItem('__t');storage=localStorage;}catch(e){storage={_d:{},getItem(k){return this._d[k]||null},setItem(k,v){this._d[k]=v},removeItem(k){delete this._d[k]}};}
+function getUsers(){try{return JSON.parse(storage.getItem('ss_users')||'{}')}catch{return {}}}
+function saveUsers(u){storage.setItem('ss_users',JSON.stringify(u))}
+function isAllDigits(s){for(let i=0;i<s.length;i++){let c=s[i];if(c<'0'||c>'9')return false;}return true;}
+function checkCode(){let code=document.getElementById('loginCode').value.trim();let debug=document.getElementById('debugMsg');debug.innerText='';if(code.length<4||code.length>6){debug.innerText='Enter 4-6 digits';return;}if(!isAllDigits(code)){debug.innerText='Only numbers';return;}tempCode=code;let users=getUsers();if(users[code]){document.getElementById('loginStep1').classList.add('hidden');document.getElementById('loginStep2').classList.add('hidden');document.getElementById('loginStepExists').classList.remove('hidden');document.getElementById('existName').innerText=users[code].name;}else{document.getElementById('loginStep1').classList.add('hidden');document.getElementById('loginStepExists').classList.add('hidden');document.getElementById('loginStep2').classList.remove('hidden');document.getElementById('showCode').innerText=code;}}
+function backToCode(){document.getElementById('loginStep1').classList.remove('hidden');document.getElementById('loginStep2').classList.add('hidden');document.getElementById('loginStepExists').classList.add('hidden');}
+function registerNew(){let name=document.getElementById('loginName').value.trim();if(!name){alert('Enter name');return}let users=getUsers();if(users[tempCode]){alert('Code exists!');backToCode();return}currentUser={name:name,code:tempCode,cycles:[],water:[],meds:[],journal:[]};users[tempCode]=currentUser;saveUsers(users);storage.setItem('ss_current',tempCode);showApp();}
+function loginExisting(){storage.setItem('ss_current',tempCode);showApp();}
+function showApp(){let cur=storage.getItem('ss_current');if(!cur)return;let users=getUsers();currentUser=users[cur];if(!currentUser)return;if(!currentUser.journal)currentUser.journal=[];if(!currentUser.water)currentUser.water=[];if(!currentUser.cycles)currentUser.cycles=[];if(!currentUser.meds)currentUser.meds=[];document.getElementById('loginScreen').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('userName').innerText=currentUser.name;renderAll();}
+function logout(){storage.removeItem('ss_current');location.reload();}
+function persist(){let users=getUsers();users[currentUser.code]=currentUser;saveUsers(users);renderAll();}
+function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('#mainNav button').forEach(b=>b.classList.remove('active'));if(window.event)window.event.target.classList.add('active');}
+function addCycle(){let d=document.getElementById('cycleDate').value||new Date().toISOString().split('T')[0];let flow=document.getElementById('cycleFlow').value;let mood=document.getElementById('cycleMood').value;let sym=document.getElementById('cycleSymptom').value;currentUser.cycles.push({id:Date.now(),date:d,flow:flow,mood:mood,sym:sym});persist();}
+function deleteCycle(id){currentUser.cycles=currentUser.cycles.filter(c=>c.id!==id);persist();}
+function renderCycles(){let list=document.getElementById('cycleList');if(!list)return;if(!currentUser.cycles.length){list.innerHTML='<small>No entries</small>';return}list.innerHTML=currentUser.cycles.slice().reverse().map(c=>'<div style="border:1px solid #ffd3de;border-radius:10px;padding:8px;margin:6px 0;display:flex;justify-content:space-between"><div><b>'+c.date+'</b> - '+c.flow+'<br><small>'+c.mood+' | '+c.sym+'</small></div><button onclick="deleteCycle('+c.id+')" style="background:#ff5a5a;color:#fff;border:none;border-radius:8px;padding:4px 8px">Delete</button></div>').join('');}
+function addWater(){let w=parseFloat(document.getElementById('waterInput').value);let diet=document.getElementById('dietInput').value;if(!w)return;currentUser.water.push({id:Date.now(),date:new Date().toLocaleDateString(),water:w,diet:diet});document.getElementById('waterInput').value='';document.getElementById('dietInput').value='';persist();}
+function deleteWater(id){currentUser.water=currentUser.water.filter(x=>x.id!==id);persist();}
+function renderWater(){let el=document.getElementById('waterList');if(!el)return;let today=new Date().toLocaleDateString();let total=currentUser.water.filter(x=>x.date===today).reduce((a,b)=>a+b.water,0);el.innerHTML='Today: '+total+' L<br>'+currentUser.water.slice(-5).reverse().map(x=>x.date+': '+x.water+'L - '+x.diet+' <button onclick="deleteWater('+x.id+')">x</button>').join('<br>');document.getElementById('waterCount').innerText=total;}
+function checkSymptom(){let s=document.getElementById('symptomInput').value.toLowerCase();let r='Keep track, drink water.';if(s.includes('fatigue'))r='Hint: Possible anemia';else if(s.includes('lump'))r='Breast lump >2 weeks -> doctor';else if(s.includes('discharge'))r='Could be infection -> test';document.getElementById('symptomResult').innerText=r;}
+function addMed(){let name=document.getElementById('medName').value,dose=document.getElementById('medDose').value,forWhat=document.getElementById('medFor').value,time=document.getElementById('medTime').value;if(!name){alert('Enter tablet name');return}currentUser.meds.push({id:Date.now(),name:name,dose:dose,forWhat:forWhat,time:time});document.getElementById('medName').value='';document.getElementById('medDose').value='';document.getElementById('medFor').value='';persist();}
+function deleteMed(id){currentUser.meds=currentUser.meds.filter(m=>m.id!==id);persist();}
+function renderMeds(){let el=document.getElementById('medList');if(!el)return;el.innerHTML=currentUser.meds.map(m=>'<div style="border:1px solid #ffd3de;border-radius:10px;padding:8px;margin:6px 0;display:flex;justify-content:space-between"><div><b>'+m.name+'</b> '+(m.time?'('+m.time+')':'')+'<br><small>'+m.dose+' - For: '+m.forWhat+'</small></div><button onclick="deleteMed('+m.id+')" style="background:#ff5a5a;color:#fff;border:none;border-radius:8px;padding:4px 8px">Delete</button></div>').join('')||'<small>No reminders yet</small>';document.getElementById('medCount').innerText=currentUser.meds.length;}
+function addJournal(){let txt=document.getElementById('journalText').value.trim();let mood=document.getElementById('journalMood').value;if(!txt)return;if(!currentUser.journal)currentUser.journal=[];currentUser.journal.push({id:Date.now(),date:new Date().toLocaleString(),text:txt,mood:mood});document.getElementById('journalText').value='';persist();}
+function deleteJournal(id){currentUser.journal=currentUser.journal.filter(j=>j.id!==id);persist();}
+function renderJournal(){let el=document.getElementById('journalList');if(!el)return;if(!currentUser.journal||!currentUser.journal.length){el.innerHTML='<small>No journal yet</small>';return}el.innerHTML=currentUser.journal.slice().reverse().map(j=>'<div style="border:1px solid #ffd3de;border-radius:10px;padding:8px;margin:6px 0"><div style="display:flex;justify-content:space-between"><b>'+j.date+'</b> <span>'+j.mood+'</span></div><p style="font-size:13px;margin:6px 0">'+j.text+'</p><button onclick="deleteJournal('+j.id+')" style="background:#ff5a5a;color:#fff;border:none;border-radius:8px;padding:4px 8px">Delete</button></div>').join('');}
+function renderAll(){renderCycles();renderWater();renderMeds();renderJournal();document.getElementById('cycleCount').innerText=currentUser.cycles.length;}
+let breathInt=null;function startBreath(){let s=0;let c=document.getElementById('breathCircle');clearInterval(breathInt);breathInt=setInterval(function(){s++;if(s%4<2){c.innerText='Inhale';c.style.transform='scale(1.4)'}else{c.innerText='Exhale';c.style.transform='scale(0.9)'}if(s>15){clearInterval(breathInt);c.innerText='Done';c.style.transform='scale(1)'}},1000)}
+let audioCtx=null,osc=[];function playSound(type){stopSounds();let statusEl=document.getElementById('soundStatus');try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();let size=audioCtx.sampleRate*2;let buf=audioCtx.createBuffer(1,size,audioCtx.sampleRate);let out=buf.getChannelData(0);for(let i=0;i<size;i++){if(type==='rain')out[i]=(Math.random()*2-1)*0.3*Math.sin(i*0.01);else if(type==='ocean')out[i]=(Math.random()*2-1)*0.2*Math.sin(i*0.005);else out[i]=(Math.random()*2-1)*0.1;}let src=audioCtx.createBufferSource();src.buffer=buf;src.loop=true;let g=audioCtx.createGain();g.gain.value=0.5;src.connect(g);g.connect(audioCtx.destination);src.start();osc.push(src);statusEl.innerText=type+' playing (offline)';}catch(e){statusEl.innerText='Error '+e.message;}}
+function stopSounds(){osc.forEach(function(o){try{o.stop()}catch(e){}});osc=[];if(audioCtx){try{audioCtx.close()}catch(e){}audioCtx=null;}document.getElementById('soundStatus').innerText='Stopped';}
+let gameInt=null,gameScore=0;function startGame(){gameScore=0;document.getElementById('score').innerText='Score:0';let area=document.getElementById('gameArea');clearInterval(gameInt);gameInt=setInterval(function(){let b=document.createElement('div');b.style.left=Math.random()*80+'%';b.style.bottom='-10%';b.style.position='absolute';b.style.width='50px';b.style.height='50px';b.style.background='radial-gradient(circle at 30% 30%, #fff, #f8b5c5)';b.style.borderRadius='50%';b.style.cursor='pointer';b.onclick=function(){gameScore++;document.getElementById('score').innerText='Score:'+gameScore;b.remove()};area.appendChild(b);let anim=b.animate([{transform:'translateY(0px)'},{transform:'translateY(-260px)'}],{duration:4000});anim.onfinish=function(){b.remove()};},500);}function stopGame(){clearInterval(gameInt);gameInt=null;document.getElementById('gameArea').querySelectorAll('div').forEach(function(el){if(el.style.position==='absolute')el.remove();});document.getElementById('score').innerText='Score:'+gameScore+' (Stopped)';}
+function setLang(l){
+storage.setItem('ss_lang',l);
+document.body.className=l==='hi'?'lang-hi':l==='kn'?'lang-kn':'';
+document.querySelectorAll('#langBar button').forEach(function(b){b.classList.remove('activeLang')});
+document.getElementById('btn-'+l).classList.add('activeLang');
+let t=T[l];
+document.getElementById('t-appName').innerText=t.appName;
+document.getElementById('t-sub').innerText=t.sub;
+document.getElementById('t-continue').innerText=t.continue;
+document.getElementById('t-codeHint').innerText=t.codeHint;
+document.getElementById('t-new').innerText=t.new;
+document.getElementById('t-register').innerText=t.register;
+document.getElementById('t-back').innerText=t.back;
+document.getElementById('t-wb').innerText=t.wb;
+document.getElementById('t-login').innerText=t.login;
+document.getElementById('t-diff').innerText=t.diff;
+document.getElementById('t-header').innerText=t.header;
+document.getElementById('t-logout').innerText=t.logout;
+document.getElementById('nav-home').innerText=t.home;
+document.getElementById('nav-cycle').innerText=t.cycle;
+document.getElementById('nav-journal').innerText=t.journal;
+document.getElementById('nav-learn').innerText=t.learn;
+document.getElementById('nav-mind').innerText=t.mind;
+document.getElementById('nav-medicine').innerText=t.medicine;
+document.getElementById('nav-sos').innerText=t.sos;
+document.getElementById('t-welcome').childNodes[0].textContent=t.welcome+' ';
+document.getElementById('t-welcomeSub').innerText=t.welcomeSub;
+document.getElementById('t-entries').innerText=t.entries;
+document.getElementById('t-waterL').innerText=t.waterL;
+document.getElementById('t-rem').innerText=t.rem;
+document.getElementById('t-water').innerText=t.water;
+document.getElementById('t-symptom').innerText=t.symptom;
+document.getElementById('t-check').innerText=t.check;
+document.getElementById('t-add').innerText=t.add;
+document.getElementById('t-cycleTitle').innerText=t.cycleTitle;
+document.getElementById('t-yourEntries').innerText=t.yourEntries;
+document.getElementById('t-light').innerText=t.light;
+document.getElementById('t-medium').innerText=t.medium;
+document.getElementById('t-heavy').innerText=t.heavy;
+document.getElementById('t-noPeriod').innerText=t.noPeriod;
+document.getElementById('t-save').innerText=t.save;
+document.getElementById('t-journalTitle').innerText=t.journalTitle;
+document.getElementById('t-journalSub').innerText=t.journalSub;
+document.getElementById('t-saveJournal').innerText=t.saveJournal;
+document.getElementById('t-journalEntries').innerText=t.journalEntries;
+document.getElementById('t-breast').innerText=t.breast;
+document.getElementById('t-breastDesc').innerText=t.breastDesc;
+document.getElementById('t-cervical').innerText=t.cervical;
+document.getElementById('t-cervicalDesc').innerText=t.cervicalDesc;
+document.getElementById('t-anemia').innerText=t.anemia;
+document.getElementById('t-anemiaDesc').innerText=t.anemiaDesc;
+document.getElementById('t-preg').innerText=t.preg;
+document.getElementById('t-pregDesc').innerText=t.pregDesc;
+document.getElementById('t-breath').innerText=t.breath;
+document.getElementById('t-startBreath').innerText=t.startBreath;
+document.getElementById('t-sounds').innerText=t.sounds;
+document.getElementById('t-rain').innerText=t.rain;
+document.getElementById('t-ocean').innerText=t.ocean;
+document.getElementById('t-white').innerText=t.white;
+document.getElementById('t-stop').innerText=t.stop;
+document.getElementById('t-game').innerText=t.game;
+document.getElementById('t-startGame').innerText=t.startGame;
+document.getElementById('t-stopGame').innerText=t.stopGame;
+document.getElementById('t-medTitle').innerText=t.medTitle;
+document.getElementById('t-medSub').innerText=t.medSub;
+document.getElementById('t-set').innerText=t.set;
+document.getElementById('t-yourRem').innerText=t.yourRem;
+document.getElementById('t-sosTitle').innerText=t.sosTitle;
+document.getElementById('t-kiran').innerText=t.kiran;
+}
+window.onload=function(){let cur=storage.getItem('ss_current');if(cur)showApp();let d=document.getElementById('cycleDate');if(d)d.valueAsDate=new Date();let l=storage.getItem('ss_lang')||'en';setLang(l);}
+</script>
+</body>
+</html>
